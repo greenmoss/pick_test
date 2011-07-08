@@ -187,11 +187,6 @@ class Layer(object):
         self.y+=dy
         self.z+=dz
 
-    def rotate(self,dx,dy,dz):
-        self.rx+=dx
-        self.ry+=dy
-        self.rz+=dz
-
     def __create_mask(self):
         print "Creating mask"
         mask=image.create(self.img.width,self.img.height)
@@ -350,7 +345,6 @@ self.h, 0.1, self.far)
     def drag(self, x, y, dx, dy, button, modifiers):
         if scene.selected is not None:
             if button==1: scene.selected.move(dx,dy,0)
-            elif button==4: scene.selected.rotate(0,0,-dx)
             elif button==5: scene.selected.move(0,0,-dy)
             return
         if button==1:
@@ -384,7 +378,6 @@ print "Camera            -> Drag LMB,CMB,RMB"
 print ""
 print "Select layer      -> Click LMB"
 print "Move layer XY     -> Drag LMB"
-print "Rotate layer      -> Drag RMB"
 print "Move layer Z      -> Drag LMB+RMB"
 print "Add star          -> RETURN"
 print ""
