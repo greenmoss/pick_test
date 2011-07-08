@@ -324,19 +324,9 @@ wx, wy, wz)
         scene.click(x,y)
 
     def drag(self, x, y, dx, dy, button, modifiers):
-        if scene.selected is not None:
-            if button==1: scene.selected.move(dx,dy,0)
-            elif button==5: scene.selected.move(0,0,-dy)
-            return
-        if button==1:
-            self.x-=dx*2
-            self.y-=dy*2
-        elif button==2:
-            self.x-=dx*2
-            self.z-=dy*2
-        elif button==4:
-            self.ry+=dx/4.
-            self.rx-=dy/4.
+        scene.selected.move(dx,dy,0)
+        self.x-=dx*2
+        self.y-=dy*2
 
     def apply(self):
         glLoadIdentity()
