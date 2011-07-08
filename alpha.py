@@ -16,6 +16,7 @@ import math
 from pyglet import window,image
 from pyglet.window import key
 from pyglet.gl import *
+import sys
 
 DOT="dot.png"
 LAYER="layer.png"
@@ -335,6 +336,8 @@ self.h, 0.1, self.far)
 
         elif symbol==key.RETURN:
             scene.load(LAYER)
+        elif symbol==key.ESCAPE:
+            sys.exit()
 
         else: print "KEY "+key.symbol_string(symbol)
 
