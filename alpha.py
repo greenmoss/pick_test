@@ -308,12 +308,6 @@ wx, wy, wz)
         if symbol==key.F1:
             self.view()
             print "Projection: Pyglet default"
-        elif symbol==key.F2:
-            print "Projection: 3D Isometric"
-            self.view()
-        elif symbol==key.F3:
-            print "Projection: 3D Perspective"
-            self.view()
         elif symbol==key.F4:
             print "Toggle Color Masks"
             scene.mask=not scene.mask
@@ -355,7 +349,6 @@ def opengl_init():
 
 print "Alpha Selection"
 print "---------------------------------"
-print "Projection matrix -> F1, F2, F3"
 print "Camera            -> Drag LMB,CMB,RMB"
 print ""
 print "Select layer      -> Click LMB"
