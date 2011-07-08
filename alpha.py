@@ -261,7 +261,6 @@ class Camera():
     rx,ry,rz=30,-45,0
     w,h=640,480
     far=8192
-    fov=60
 
     mat_vis = (GLint * 4)()
     mat_pro = (GLdouble * 16)()
@@ -306,7 +305,6 @@ wx, wy, wz)
         glGetDoublev(GL_PROJECTION_MATRIX, self.mat_pro)
 
     def key(self, symbol, modifiers):
-        self.mode=1
         if symbol==key.F1:
             self.view()
             print "Projection: Pyglet default"
@@ -315,12 +313,6 @@ wx, wy, wz)
             self.view()
         elif symbol==key.F3:
             print "Projection: 3D Perspective"
-            self.view()
-        elif self.mode==3 and symbol==key.NUM_SUBTRACT:
-            self.fov-=1
-            self.view()
-        elif self.mode==3 and symbol==key.NUM_ADD:
-            self.fov+=1
             self.view()
         elif symbol==key.F4:
             print "Toggle Color Masks"
