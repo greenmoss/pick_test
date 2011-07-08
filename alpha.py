@@ -257,7 +257,6 @@ class Layer(object):
 
 #---------------------------------
 class Camera():
-    mode=1
     x,y,z=0,0,512
     rx,ry,rz=30,-45,0
     w,h=640,480
@@ -302,27 +301,20 @@ wx, wy, wz)
         glGetIntegerv(GL_VIEWPORT, self.mat_vis)
         print "Viewport "+str(width)+"x"+str(height)
         glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        if self.mode==2: glOrtho(-self.w/2.,self.w/2.,-self.h/
-2.,self.h/2.,0,self.far)
-        elif self.mode==3: gluPerspective(self.fov, float(self.w)/
-self.h, 0.1, self.far)
-        else: glOrtho(0, self.w, 0, self.h, -1, 1)
+        glOrtho(0, self.w, 0, self.h, -1, 1)
         glMatrixMode(GL_MODELVIEW)
         glGetDoublev(GL_PROJECTION_MATRIX, self.mat_pro)
 
     def key(self, symbol, modifiers):
+        self.mode=1
         if symbol==key.F1:
-            self.mode=1
             self.view()
             print "Projection: Pyglet default"
         elif symbol==key.F2:
             print "Projection: 3D Isometric"
-            self.mode=2
             self.view()
         elif symbol==key.F3:
             print "Projection: 3D Perspective"
-            self.mode=3
             self.view()
         elif self.mode==3 and symbol==key.NUM_SUBTRACT:
             self.fov-=1
@@ -362,11 +354,6 @@ self.h, 0.1, self.far)
 
     def apply(self):
         glLoadIdentity()
-        if self.mode==1: return
-        glTranslatef(-self.x,-self.y,-self.z)
-        glRotatef(self.rx,1,0,0)
-        glRotatef(self.ry,0,1,0)
-        glRotatef(self.rz,0,0,1)
 
 #---------------------------------
 def opengl_init():
