@@ -100,15 +100,6 @@ class Layers(object):
         self.layers.append(layer)
         return layer
 
-    def __border(self):
-        glColor4f(1,1,1,1)
-        glBegin(GL_LINE_LOOP)
-        glVertex3f(1,1,0)
-        glVertex3f(640,1,0)
-        glVertex3f(640,480,0)
-        glVertex3f(1,480,0)
-        glEnd()
-
     def __order_z(self):
         z_pre=-32000
         d={}
@@ -152,7 +143,6 @@ class Layers(object):
         self.selected = self.__find_layer(x,y)
 
     def draw(self):
-        self.__border()
         self.__order_z()
         for layer in self.layers:
             layer.draw(self.mask)
@@ -172,16 +162,6 @@ class Layer(object):
         self.px=-self.img.width/2
         self.py=-self.img.height/2
         self.__create_mask()
-
-    def __border(self):
-        glColor4f(1,0,1,0.5)
-        glBegin(GL_LINE_LOOP)
-        glVertex3f(-self.px,-self.py,0)
-        glVertex3f(self.px,-self.py,0)
-        glVertex3f(self.px,self.py,0)
-        glVertex3f(-self.px,self.py,0)
-        glColor4f(1,1,1,1)
-        glEnd()
 
     def move(self,dx,dy,dz):
         self.x+=dx
@@ -245,7 +225,6 @@ class Layer(object):
         else:
             self.img.blit(self.px,self.py,0)
             if self.selected:
-                self.__border()
                 laser.blit(self.lx-laser.width/2,self.ly-laser.height/
 2,1)
         glPopMatrix()
