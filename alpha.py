@@ -98,24 +98,6 @@ class Layers(object):
         self.layers.append(layer)
         return layer
 
-    def __order_z(self):
-        z_pre=-32000
-        d={}
-        good=True
-        n=0
-        for layer in self.layers:
-            z=layer.z
-            d[n]=z
-            if z<z_pre: good=False
-            z_pre=z
-            n+=1
-        if good: return
-        print "Reordering layers"
-        temp=[]
-        for n,z in sorted(d.items(), lambda x, y: cmp(x[1], y[1])):
-            temp.append(self.layers[n])
-        self.layers=temp
-
     def __read_color(self,x,y):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         cam.apply()
@@ -141,7 +123,6 @@ class Layers(object):
         self.selected = self.__find_layer(x,y)
 
     def draw(self):
-        self.__order_z()
         for layer in self.layers:
             layer.draw(self.mask)
 
