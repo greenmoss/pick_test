@@ -18,10 +18,8 @@ from pyglet.window import key
 from pyglet.gl import *
 import sys
 
-DOT="dot.png"
 LAYER="layer.png"
 
-laser=image.load(DOT)
 DEG2RAD=-0.01745
 
 def real_color(c):
@@ -224,9 +222,6 @@ class Layer(object):
             glColor4f(1,1,1,1)
         else:
             self.img.blit(self.px,self.py,0)
-            if self.selected:
-                laser.blit(self.lx-laser.width/2,self.ly-laser.height/
-2,1)
         glPopMatrix()
 
     def toca(self,px,py):
