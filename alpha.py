@@ -67,12 +67,12 @@ def unique_color(n):
     glReadBuffer(GL_BACK)
     glReadPixels(0,0,1,1,GL_RGB,GL_FLOAT,read_colors)
     glClearColor(fc[0],fc[1],fc[2],fc[3])
-    painted=(float(read_colors[0]),float(read_colors[1]),float(read_colors[2]))
+    painted_color=(float(read_colors[0]),float(read_colors[1]),float(read_colors[2]))
     glMatrixMode(GL_PROJECTION)
     glPopMatrix()
     glMatrixMode(GL_MODELVIEW)
     glPopMatrix()
-    return painted
+    return painted_color
 
 #---------------------------------
 
