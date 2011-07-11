@@ -142,11 +142,6 @@ class Layer(object):
         mask.texture.blit_into(self.img,0,0,0)
         self.mask=mask
 
-    def move(self,dx,dy,dz):
-        self.x+=dx
-        self.y+=dy
-        self.z+=dz
-
     def touch(self,mouse_x,mouse_y):
         self.selected=True
         print "Space point=",str((mouse_x,mouse_y))
@@ -185,7 +180,8 @@ class Camera():
         scene.click(x,y)
 
     def drag(self, x, y, dx, dy, button, modifiers):
-        scene.selected.move(dx,dy,0)
+        scene.selected.x+=dx
+        scene.selected.y+=dy
         self.x-=dx*2
         self.y-=dy*2
 
