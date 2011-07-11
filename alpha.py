@@ -48,10 +48,13 @@ def real_color(c):
     glPopMatrix()
     return p
 
-def hsi_rgb(H,S,I):
-    """ This is an arbitrary color conversion, not interesting.
-        It can be simpler, but this one is pretty
-    """
+def unique_color(n):
+    '''Returns a pastel color derived from int n'''
+	 # not sure what H, S, and I are supposed to signify
+    H=n*39
+    S=1./(1+int((n+1)/40.))
+    I=0.5
+
     H+=180
     H=H%360
     Z=1+int(H/120)
@@ -68,18 +71,12 @@ def hsi_rgb(H,S,I):
         c1=c2
         c2=temp
 
-    if Z==1: return c1,c2,c3
-    elif Z==2: return c3,c1,c2
-    elif Z==3: return c2,c3,c1
-    return 0,0,0
+    color=(0,0,0)
+    if Z==1: color=(c1,c2,c3)
+    elif Z==2: color=(c3,c1,c2)
+    elif Z==3: color=(c2,c3,c1)
 
-def unique_color(n):
-    '''Returns a color for n
-    '''
-    H=n*39
-    S=1./(1+int((n+1)/40.))
-    I=0.5
-    return real_color(hsi_rgb(H,S,I))
+    return real_color(color)
 
 #---------------------------------
 
