@@ -182,20 +182,8 @@ class Camera():
     w,h=640,480
     far=8192
 
-    def view(self,width=None,height=None):
-        if width is None: width,height=self.w,self.h
-        else: self.w,self.h=width,height
-        glViewport(0, 0, width, height)
-        print "Viewport "+str(width)+"x"+str(height)
-        glMatrixMode(GL_PROJECTION)
-        glOrtho(0, self.w, 0, self.h, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-
     def key(self, symbol, modifiers):
         if symbol==key.F1:
-            self.view()
-            print "Projection: Pyglet default"
-        elif symbol==key.F4:
             print "Toggle Color Masks"
             scene.mask=not scene.mask
 
@@ -231,8 +219,7 @@ print ""
 
 scene=Layers()
 cam=Camera()
-win = window.Window(resizable=True)
-win.on_resize=cam.view
+win = window.Window()
 win.on_key_press=cam.key
 win.on_mouse_drag=cam.drag
 win.on_mouse_press=cam.click
