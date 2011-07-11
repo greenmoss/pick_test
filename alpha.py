@@ -22,32 +22,6 @@ LAYER="layer.png"
 
 DEG2RAD=-0.01745
 
-def real_color(c):
-    '''When the mask is painted with glColor,
-       the color returned by glReadPixels is not exactly the same.
-       This function paints and then returns the real color.
-    '''
-    glMatrixMode(GL_PROJECTION)
-    glPushMatrix()
-    glLoadIdentity()
-    glMatrixMode(GL_MODELVIEW)
-    glPushMatrix()
-    glLoadIdentity()
-    fc=(GLfloat * 4)()
-    glGetFloatv(GL_COLOR_CLEAR_VALUE,fc)
-    glClearColor(c[0],c[1],c[2],1)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    punto=(GLfloat * 3)()
-    glReadBuffer(GL_BACK)
-    glReadPixels(0,0,1,1,GL_RGB,GL_FLOAT,punto)
-    glClearColor(fc[0],fc[1],fc[2],fc[3])
-    p=(float(punto[0]),float(punto[1]),float(punto[2]))
-    glMatrixMode(GL_PROJECTION)
-    glPopMatrix()
-    glMatrixMode(GL_MODELVIEW)
-    glPopMatrix()
-    return p
-
 def unique_color(n):
     '''Returns a pastel color derived from int n'''
 	 # not sure what H, S, and I are supposed to signify
@@ -76,7 +50,29 @@ def unique_color(n):
     elif Z==2: color=(c3,c1,c2)
     elif Z==3: color=(c2,c3,c1)
 
-    return real_color(color)
+    # When the mask is painted with glColor,
+    # the color returned by glReadPixels is not exactly the same.
+    # This code paints and then returns the real color.
+    glMatrixMode(GL_PROJECTION)
+    glPushMatrix()
+    glLoadIdentity()
+    glMatrixMode(GL_MODELVIEW)
+    glPushMatrix()
+    glLoadIdentity()
+    fc=(GLfloat * 4)()
+    glGetFloatv(GL_COLOR_CLEAR_VALUE,fc)
+    glClearColor(color[0],color[1],color[2],1)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    read_colors=(GLfloat * 3)()
+    glReadBuffer(GL_BACK)
+    glReadPixels(0,0,1,1,GL_RGB,GL_FLOAT,read_colors)
+    glClearColor(fc[0],fc[1],fc[2],fc[3])
+    painted=(float(read_colors[0]),float(read_colors[1]),float(read_colors[2]))
+    glMatrixMode(GL_PROJECTION)
+    glPopMatrix()
+    glMatrixMode(GL_MODELVIEW)
+    glPopMatrix()
+    return painted
 
 #---------------------------------
 
