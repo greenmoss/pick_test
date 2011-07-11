@@ -126,7 +126,6 @@ class Layers(object):
 #---------------------------------
 class Layer(object):
     selected=False
-    lx,ly=0,0
     x,y,z=0,0,0
 
     def __init__(self,id,img,id_color):
@@ -153,9 +152,7 @@ class Layer(object):
     def touch(self,mouse_x,mouse_y):
         self.selected=True
         print "Space point=",str((mouse_x,mouse_y))
-        self.lx = mouse_x-self.x
-        self.ly = mouse_y-self.y
-        print "Plane point=",str((self.lx,self.ly))
+        print "Plane point=",str((mouse_x-self.x,mouse_y-self.y))
 
     def draw(self,mask=False):
         glPushMatrix()
