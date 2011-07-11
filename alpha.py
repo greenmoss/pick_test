@@ -183,10 +183,8 @@ class Layer(object):
 
     def touch(self,mouse_x,mouse_y):
         self.selected=True
-        px,py,pz=cam.ray_3d(mouse_x,mouse_y,self.mat_mod,
-(self.x,self.y,self.z),self.normal())
-        print "Space point=",str((px,py,pz))
-        self.local_point(px,py,pz)
+        print "Space point=",str((mouse_x,mouse_y))
+        self.local_point(mouse_x,mouse_y,0)
         print "Plane point=",str((self.lx,self.ly))
 
     def draw(self,mask=False):
@@ -214,34 +212,6 @@ class Camera():
 
     mat_vis = (GLint * 4)()
     mat_pro = (GLdouble * 16)()
-
-    def ray_3d(self,px=0,py=0,matriz=None,punto=(0,0,0),normal=
-(0,0,1)):
-        '''Get the point where the mouse line touches a plane
-        '''
-        x,y,z=punto
-        nx,ny,nz=normal
-
-        wx,wy,wz = GLdouble(),GLdouble(),GLdouble()
-        gluUnProject(px, py, 0.0, matriz, self.mat_pro, self.mat_vis,
-wx, wy, wz)
-        x0,y0,z0=wx.value,wy.value,wz.value
-        gluUnProject(px, py, 1.0, matriz, self.mat_pro, self.mat_vis,
-wx, wy, wz)
-        x1,y1,z1=wx.value,wy.value,wz.value
-
-        lx, ly, lz = x1-x0, y1-y0, z1-z0
-        m=math.sqrt(lx*lx+ly*ly+lz*lz)
-        if m==0.: m=1
-        ux, uy, uz = lx/m, ly/m, lz/m
-        nu=nx*ux+ny*uy+nz*uz
-        if nu==0: return 8192,8192,8192
-
-        dx, dy, dz = x0-x, y0-y, z0-z
-        nd=nx*dx+ny*dy+nz*dz
-        sp=-nd/nu
-        px, py, pz = x0+sp*ux, y0+sp*uy, z0+sp*uz
-        return px,py,pz
 
     def view(self,width=None,height=None):
         if width is None: width,height=self.w,self.h
