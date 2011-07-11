@@ -92,7 +92,7 @@ class Layers(object):
     def __init__(self):
         self.layers=[]
 
-    def load(self,file):
+    def create_layer(self,file):
         self.num+=1
         layer=Layer(self.num,file,unique_color(self.num))
         self.layers.append(layer)
@@ -205,11 +205,6 @@ class Layer(object):
             self.img.blit(self.px,self.py,0)
         glPopMatrix()
 
-    def toca(self,px,py):
-        px,py,pz=self.toca_3d(px,py)
-        if px is None: return None,None
-        return self.eje.toca_2d(px,py,pz)
-
 #---------------------------------
 class Camera():
     x,y,z=0,0,512
@@ -268,7 +263,7 @@ wx, wy, wz)
             scene.mask=not scene.mask
 
         elif symbol==key.RETURN:
-            scene.load(LAYER)
+            scene.create_layer(LAYER)
         elif symbol==key.ESCAPE:
             sys.exit()
 
@@ -312,7 +307,7 @@ win.on_mouse_press=cam.click
 opengl_init()
 
 for n in range (0,3):
-    layer=scene.load(LAYER)
+    layer=scene.create_layer(LAYER)
     layer.x=160+n*160
     layer.y=240
     layer.z=n-1
