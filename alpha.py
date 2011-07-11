@@ -97,7 +97,7 @@ class Layers(object):
 
     def __read_color(self,x,y):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        cam.apply()
+        glLoadIdentity()
         for layer in self.layers:
             layer.selected=False
             layer.draw(True)
@@ -128,7 +128,6 @@ class Layer(object):
     selected=False
     lx,ly=0,0
     x,y,z=0,0,0
-    rx,ry,rz=0,0,0
     mat_mod = (GLdouble * 16)()
 
     def __init__(self,id,img,id_color):
@@ -163,9 +162,6 @@ class Layer(object):
         glGetDoublev(GL_MODELVIEW_MATRIX, self.mat_mod)
         glPushMatrix()
         glTranslatef(self.x,self.y,self.z)
-        glRotatef(self.rx, 1, 0, 0)
-        glRotatef(self.ry, 0, 1, 0)
-        glRotatef(self.rz, 0, 0, 1)
         if mask:
             glColor4f(self.id_color[0],self.id_color[1],self.id_color
 [2],1)
@@ -178,7 +174,6 @@ class Layer(object):
 #---------------------------------
 class Camera():
     x,y,z=0,0,512
-    rx,ry,rz=30,-45,0
     w,h=640,480
     far=8192
 
@@ -186,12 +181,10 @@ class Camera():
         if symbol==key.F1:
             print "Toggle Color Masks"
             scene.mask=not scene.mask
-
         elif symbol==key.RETURN:
             scene.create_layer(LAYER)
         elif symbol==key.ESCAPE:
             sys.exit()
-
         else: print "KEY "+key.symbol_string(symbol)
 
     def click(self, x, y, button, modifiers):
@@ -202,9 +195,6 @@ class Camera():
         scene.selected.move(dx,dy,0)
         self.x-=dx*2
         self.y-=dy*2
-
-    def apply(self):
-        glLoadIdentity()
 
 #---------------------------------
 print "Alpha Selection"
@@ -236,6 +226,6 @@ for n in range (0,3):
 while not win.has_exit:
     win.dispatch_events()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    cam.apply()
+    glLoadIdentity()
     scene.draw()
     win.flip() 
