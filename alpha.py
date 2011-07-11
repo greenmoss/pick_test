@@ -182,19 +182,14 @@ class Camera():
     w,h=640,480
     far=8192
 
-    mat_vis = (GLint * 4)()
-    mat_pro = (GLdouble * 16)()
-
     def view(self,width=None,height=None):
         if width is None: width,height=self.w,self.h
         else: self.w,self.h=width,height
         glViewport(0, 0, width, height)
-        glGetIntegerv(GL_VIEWPORT, self.mat_vis)
         print "Viewport "+str(width)+"x"+str(height)
         glMatrixMode(GL_PROJECTION)
         glOrtho(0, self.w, 0, self.h, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glGetDoublev(GL_PROJECTION_MATRIX, self.mat_pro)
 
     def key(self, symbol, modifiers):
         if symbol==key.F1:
@@ -224,11 +219,6 @@ class Camera():
         glLoadIdentity()
 
 #---------------------------------
-def opengl_init():
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glDepthFunc(GL_LEQUAL)
-
 print "Alpha Selection"
 print "---------------------------------"
 print "Camera            -> Drag LMB,CMB,RMB"
@@ -246,7 +236,9 @@ win.on_resize=cam.view
 win.on_key_press=cam.key
 win.on_mouse_drag=cam.drag
 win.on_mouse_press=cam.click
-opengl_init()
+glEnable(GL_BLEND)
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+glDepthFunc(GL_LEQUAL)
 
 for n in range (0,3):
     layer=scene.create_layer(LAYER)
