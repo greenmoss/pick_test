@@ -155,18 +155,6 @@ class Layer(object):
         mask.texture.blit_into(self.img,0,0,0)
         self.mask=mask
 
-    def normal(self):
-        '''Devuelve el vector normal.
-        '''
-        Cx=math.cos(DEG2RAD*self.rx)
-        Cy=math.cos(DEG2RAD*self.ry)
-        Sx=math.sin(DEG2RAD*self.rx)
-        Sy=math.sin(DEG2RAD*self.ry)
-        nx=-Sy
-        ny=Sx*Cy
-        nz=Cy*Cx
-        return nx,ny,nz
-
     def local_point(self,px,py,pz):
         Cx=math.cos(-DEG2RAD*self.rx)
         Cy=math.cos(DEG2RAD*self.ry)
