@@ -128,7 +128,6 @@ class Layer(object):
     selected=False
     lx,ly=0,0
     x,y,z=0,0,0
-    mat_mod = (GLdouble * 16)()
 
     def __init__(self,id,img,id_color):
         self.id=id
@@ -159,7 +158,6 @@ class Layer(object):
         print "Plane point=",str((self.lx,self.ly))
 
     def draw(self,mask=False):
-        glGetDoublev(GL_MODELVIEW_MATRIX, self.mat_mod)
         glPushMatrix()
         glTranslatef(self.x,self.y,self.z)
         if mask:
