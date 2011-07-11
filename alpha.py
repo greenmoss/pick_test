@@ -134,20 +134,18 @@ class Layer(object):
         self.id_color=id_color
         self.px=-self.img.width/2
         self.py=-self.img.height/2
-        self.__create_mask()
 
-    def move(self,dx,dy,dz):
-        self.x+=dx
-        self.y+=dy
-        self.z+=dz
-
-    def __create_mask(self):
-        print "Creating mask"
+        # image mask
         mask=image.create(self.img.width,self.img.height)
         mask.image_data.format="A"
         mask.image_data.pitch=self.img.width
         mask.texture.blit_into(self.img,0,0,0)
         self.mask=mask
+
+    def move(self,dx,dy,dz):
+        self.x+=dx
+        self.y+=dy
+        self.z+=dz
 
     def touch(self,mouse_x,mouse_y):
         self.selected=True
