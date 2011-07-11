@@ -155,24 +155,11 @@ class Layer(object):
         mask.texture.blit_into(self.img,0,0,0)
         self.mask=mask
 
-    def local_point(self,px,py,pz):
-        Cx=math.cos(-DEG2RAD*self.rx)
-        Cy=math.cos(DEG2RAD*self.ry)
-        Cz=math.cos(-DEG2RAD*self.rz)
-        Sx=math.sin(-DEG2RAD*self.rx)
-        Sy=math.sin(DEG2RAD*self.ry)
-        Sz=math.sin(-DEG2RAD*self.rz)
-        x=px-self.x
-        y=py-self.y
-        z=pz-self.z
-        lx=Cz*(Cy*x+Sy*(Cx*z-Sx*y))+Sz*(Cx*y+Sx*z)
-        ly=Cz*(Cx*y+Sx*z)-Sz*(Cy*x+Sy*(Cx*z-Sx*y))
-        self.lx,self.ly=lx,ly
-
     def touch(self,mouse_x,mouse_y):
         self.selected=True
         print "Space point=",str((mouse_x,mouse_y))
-        self.local_point(mouse_x,mouse_y,0)
+        self.lx = mouse_x-self.x
+        self.ly = mouse_y-self.y
         print "Plane point=",str((self.lx,self.ly))
 
     def draw(self,mask=False):
