@@ -91,29 +91,25 @@ class Layers(object):
         self.layers.append(layer)
         return layer
 
-    def __read_color(self,x,y):
+    def click(self,x,y):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
         for layer in self.layers:
             layer.selected=False
             layer.draw(True)
+
+		  # read the pixel color of the selection area
         c=(GLfloat * 3)()
         glReadBuffer(GL_BACK)
         glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,c)
         color=(float(c[0]),float(c[1]),float(c[2]))
         print "Color =",str(color)
-        return color
 
-    def __find_layer(self,x,y):
-        color=self.__read_color(x,y)
+        self.selected = None
         for layer in self.layers:
             if layer.id_color==color:
                 layer.touch(x,y)
-                return layer
-        return None
-
-    def click(self,x,y):
-        self.selected = self.__find_layer(x,y)
+                self.selected = layer
 
     def draw(self):
         for layer in self.layers:
