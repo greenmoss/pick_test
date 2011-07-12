@@ -87,8 +87,7 @@ class Layer(object):
         glPushMatrix()
         glTranslatef(self.x,self.y,self.z)
         if mask:
-            glColor4f(self.id_color[0],self.id_color[1],self.id_color
-[2],1)
+            glColor4f(self.id_color[0],self.id_color[1],self.id_color[2],1)
             self.mask.blit(self.px,self.py,0)
             glColor4f(1,1,1,1)
         else:
@@ -175,8 +174,7 @@ print "Camera            -> Drag LMB,CMB,RMB"
 print ""
 print "Select layer      -> Click LMB"
 print "Move layer XY     -> Drag LMB"
-print "Move layer Z      -> Drag LMB+RMB"
-print "Add star          -> RETURN"
+print "Add graphic       -> RETURN"
 print ""
 
 scene=Layers()
