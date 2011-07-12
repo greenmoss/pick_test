@@ -67,7 +67,7 @@ class Layer(object):
     def __init__(self,id,img):
         self.id=id
         self.img=image.load(img)
-        self.id_color=self.pastel_color()
+        self.id_color=self.derive_color()
         self.px=-self.img.width/2
         self.py=-self.img.height/2
 
@@ -94,8 +94,8 @@ class Layer(object):
             self.img.blit(self.px,self.py,0)
         glPopMatrix()
 
-    def pastel_color(self):
-        '''Returns a pastel color derived from int self.id'''
+    def derive_color(self):
+        '''Returns a color derived from int self.id'''
         # not sure what H, S, and I are supposed to signify
         H=self.id*39
         S=1./(1+int((self.id+1)/40.))
