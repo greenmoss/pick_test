@@ -18,62 +18,6 @@ from pyglet.window import key
 from pyglet.gl import *
 import sys
 
-LAYER="layer.png"
-
-DEG2RAD=-0.01745
-
-def unique_color(n):
-    '''Returns a pastel color derived from int n'''
-	 # not sure what H, S, and I are supposed to signify
-    H=n*39
-    S=1./(1+int((n+1)/40.))
-    I=0.5
-
-    H+=180
-    H=H%360
-    Z=1+int(H/120)
-    if H>=120 and H<240: H-=120
-    elif H>=240: H-=240
-
-    ang=float((H*9./6.)-90.)
-    c1=S*(0.5+I)
-    c2=S*math.cos(ang*DEG2RAD)
-    c3=S*(0.5-I)
-
-    if H>60:
-        temp=c1
-        c1=c2
-        c2=temp
-
-    color=(0,0,0)
-    if Z==1: color=(c1,c2,c3)
-    elif Z==2: color=(c3,c1,c2)
-    elif Z==3: color=(c2,c3,c1)
-
-    # When the mask is painted with glColor,
-    # the color returned by glReadPixels is not exactly the same.
-    # This code paints and then returns the real color.
-    glMatrixMode(GL_PROJECTION)
-    glPushMatrix()
-    glLoadIdentity()
-    glMatrixMode(GL_MODELVIEW)
-    glPushMatrix()
-    glLoadIdentity()
-    fc=(GLfloat * 4)()
-    glGetFloatv(GL_COLOR_CLEAR_VALUE,fc)
-    glClearColor(color[0],color[1],color[2],1)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    read_colors=(GLfloat * 3)()
-    glReadBuffer(GL_BACK)
-    glReadPixels(0,0,1,1,GL_RGB,GL_FLOAT,read_colors)
-    glClearColor(fc[0],fc[1],fc[2],fc[3])
-    painted_color=(float(read_colors[0]),float(read_colors[1]),float(read_colors[2]))
-    glMatrixMode(GL_PROJECTION)
-    glPopMatrix()
-    glMatrixMode(GL_MODELVIEW)
-    glPopMatrix()
-    return painted_color
-
 #---------------------------------
 
 class Layers(object):
@@ -85,9 +29,9 @@ class Layers(object):
     def __init__(self):
         self.layers=[]
 
-    def create_layer(self,file):
+    def create_layer(self):
         self.num+=1
-        layer=Layer(self.num,file,unique_color(self.num))
+        layer=Layer(self.num,'graphic.png')
         self.layers.append(layer)
         return layer
 
@@ -120,10 +64,10 @@ class Layer(object):
     selected=False
     x,y,z=0,0,0
 
-    def __init__(self,id,img,id_color):
+    def __init__(self,id,img):
         self.id=id
         self.img=image.load(img)
-        self.id_color=id_color
+        self.id_color=self.pastel_color()
         self.px=-self.img.width/2
         self.py=-self.img.height/2
 
@@ -151,6 +95,58 @@ class Layer(object):
             self.img.blit(self.px,self.py,0)
         glPopMatrix()
 
+    def pastel_color(self):
+        '''Returns a pastel color derived from int self.id'''
+        # not sure what H, S, and I are supposed to signify
+        H=self.id*39
+        S=1./(1+int((self.id+1)/40.))
+        I=0.5
+    
+        H+=180
+        H=H%360
+        Z=1+int(H/120)
+        if H>=120 and H<240: H-=120
+        elif H>=240: H-=240
+    
+        ang=float((H*9./6.)-90.)
+        c1=S*(0.5+I)
+        c2=S*math.cos(ang*-0.01745)
+        c3=S*(0.5-I)
+    
+        if H>60:
+            temp=c1
+            c1=c2
+            c2=temp
+    
+        color=(0,0,0)
+        if Z==1: color=(c1,c2,c3)
+        elif Z==2: color=(c3,c1,c2)
+        elif Z==3: color=(c2,c3,c1)
+    
+        # When the mask is painted with glColor,
+        # the color returned by glReadPixels is not exactly the same.
+        # This code paints and then returns the real color.
+        glMatrixMode(GL_PROJECTION)
+        glPushMatrix()
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+        glLoadIdentity()
+        fc=(GLfloat * 4)()
+        glGetFloatv(GL_COLOR_CLEAR_VALUE,fc)
+        glClearColor(color[0],color[1],color[2],1)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        read_colors=(GLfloat * 3)()
+        glReadBuffer(GL_BACK)
+        glReadPixels(0,0,1,1,GL_RGB,GL_FLOAT,read_colors)
+        glClearColor(fc[0],fc[1],fc[2],fc[3])
+        painted_color=(float(read_colors[0]),float(read_colors[1]),float(read_colors[2]))
+        glMatrixMode(GL_PROJECTION)
+        glPopMatrix()
+        glMatrixMode(GL_MODELVIEW)
+        glPopMatrix()
+        return painted_color
+
 #---------------------------------
 class Camera():
     x,y,z=0,0,512
@@ -162,7 +158,7 @@ class Camera():
             print "Toggle Color Masks"
             scene.mask=not scene.mask
         elif symbol==key.RETURN:
-            scene.create_layer(LAYER)
+            scene.create_layer()
         elif symbol==key.ESCAPE:
             sys.exit()
         else: print "KEY "+key.symbol_string(symbol)
@@ -199,7 +195,7 @@ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 glDepthFunc(GL_LEQUAL)
 
 for n in range (0,3):
-    layer=scene.create_layer(LAYER)
+    layer=scene.create_layer()
     layer.x=160+n*160
     layer.y=240
     layer.z=n-1
