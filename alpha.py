@@ -149,9 +149,6 @@ class Layer(object):
 
 #---------------------------------
 class Camera():
-    x,y,z=0,0,512
-    w,h=640,480
-    far=8192
 
     def key(self, symbol, modifiers):
         if symbol==key.F1:
@@ -170,8 +167,6 @@ class Camera():
     def drag(self, x, y, dx, dy, button, modifiers):
         scene.selected.x+=dx
         scene.selected.y+=dy
-        self.x-=dx*2
-        self.y-=dy*2
 
 #---------------------------------
 print "Alpha Selection"
