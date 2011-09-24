@@ -166,6 +166,8 @@ class Camera():
 		scene.click(x,y)
 
 	def drag(self, x, y, dx, dy, button, modifiers):
+		if scene.selected == None:
+			return
 		scene.selected.x+=dx
 		scene.selected.y+=dy
 
