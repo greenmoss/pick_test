@@ -77,6 +77,8 @@ class Image(object):
 		mask.texture.blit_into(self.img,0,0,0)
 		self.mask=mask
 
+		# image sprite
+
 	def touch(self,mouse_x,mouse_y):
 		self.selected=True
 		print "Space point=",str((mouse_x,mouse_y))
