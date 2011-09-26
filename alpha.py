@@ -4,7 +4,7 @@
 # 3D Selection of 2D images with alpha transparency.
 #
 # When mouse is pressed, draw the color coded masks in the back buffer,
-# and read the color. If there is a layer with the color id, get the
+# and read the color. If there is an image with the color id, get the
 # point where the mouse line intersects the plane, and get the coords
 # in the plane.
 #
@@ -13,36 +13,35 @@
 #---------------------------------
 
 import math
-from pyglet import window,image
+import pyglet
 from pyglet.window import key
 from pyglet.gl import *
 import sys
 
 #---------------------------------
 
-class Layers(object):
-	'''The Scene
-	'''
+class Images(object):
+	'Keep track of all images'
 	selected=None
 	mask=False
 	num=0
 	def __init__(self):
-		self.layers=[]
+		self.images=[]
 
-	def create_layer(self):
+	def create_image(self):
 		self.num+=1
-		layer=Layer(self.num,'graphic.png')
-		self.layers.append(layer)
-		return layer
+		image=Image(self.num,'graphic.png')
+		self.images.append(image)
+		return image
 
 	def click(self,x,y):
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glLoadIdentity()
-		for layer in self.layers:
-			layer.selected=False
-			layer.draw(True)
+		for image in self.images:
+			image.selected=False
+			image.draw(True)
 
-		  # read the pixel color of the selection area
+		# read the pixel color of the selection area
 		c=(GLfloat * 3)()
 		glReadBuffer(GL_BACK)
 		glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,c)
@@ -50,29 +49,29 @@ class Layers(object):
 		print "Color =",str(color)
 
 		self.selected = None
-		for layer in self.layers:
-			if layer.id_color==color:
-				layer.touch(x,y)
-				self.selected = layer
+		for image in self.images:
+			if image.id_color==color:
+				image.touch(x,y)
+				self.selected = image
 
 	def draw(self):
-		for layer in self.layers:
-			layer.draw(self.mask)
+		for image in self.images:
+			image.draw(self.mask)
 
 #---------------------------------
-class Layer(object):
+class Image(object):
 	selected=False
 	x,y,z=0,0,0
 
 	def __init__(self,id,img):
 		self.id=id
-		self.img=image.load(img)
+		self.img=pyglet.image.load(img)
 		self.id_color=self.derive_color()
 		self.px=-self.img.width/2
 		self.py=-self.img.height/2
 
 		# image mask
-		mask=image.create(self.img.width,self.img.height)
+		mask=pyglet.image.create(self.img.width,self.img.height)
 		mask.image_data.format="A"
 		mask.image_data.pitch=self.img.width
 		mask.texture.blit_into(self.img,0,0,0)
@@ -156,7 +155,7 @@ class Camera():
 			print "Toggle Color Masks"
 			scene.mask=not scene.mask
 		elif symbol==key.RETURN:
-			scene.create_layer()
+			scene.create_image()
 		elif symbol==key.ESCAPE:
 			sys.exit()
 		else: print "KEY "+key.symbol_string(symbol)
@@ -176,14 +175,14 @@ print "Alpha Selection"
 print "---------------------------------"
 print "Camera			-> Drag LMB,CMB,RMB"
 print ""
-print "Select layer	  -> Click LMB"
-print "Move layer XY	 -> Drag LMB"
+print "Select image	  -> Click LMB"
+print "Move image XY	 -> Drag LMB"
 print "Add graphic	   -> RETURN"
 print ""
 
-scene=Layers()
+scene=Images()
 cam=Camera()
-win = window.Window()
+win = pyglet.window.Window()
 win.on_key_press=cam.key
 win.on_mouse_drag=cam.drag
 win.on_mouse_press=cam.click
@@ -192,10 +191,10 @@ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 glDepthFunc(GL_LEQUAL)
 
 for n in range (0,3):
-	layer=scene.create_layer()
-	layer.x=160+n*160
-	layer.y=240
-	layer.z=n-1
+	image=scene.create_image()
+	image.x=160+n*160
+	image.y=240
+	image.z=n-1
 
 while not win.has_exit:
 	win.dispatch_events()
