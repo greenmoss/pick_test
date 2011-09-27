@@ -42,10 +42,10 @@ class Images(object):
 			image.draw(True)
 
 		# read the pixel color of the selection area
-		c=(GLfloat * 3)()
+		c=(GLubyte * 3)()
 		glReadBuffer(GL_BACK)
-		glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,c)
-		color=(float(c[0]),float(c[1]),float(c[2]))
+		glReadPixels(x,y,1,1,GL_RGB,GL_UNSIGNED_BYTE,c)
+		color=(c[0],c[1],c[2])
 		print "Color =",str(color)
 
 		self.selected = None
@@ -63,21 +63,33 @@ class Image(object):
 	selected=False
 	x,y,z=0,0,0
 
-	def __init__(self,id,img):
+	def __init__(self,id,image):
 		self.id=id
-		self.img=pyglet.image.load(img)
+		self.image=pyglet.image.load(image)
 		self.id_color=self.derive_color()
-		self.px=-self.img.width/2
-		self.py=-self.img.height/2
-
-		# image mask
-		mask=pyglet.image.create(self.img.width,self.img.height)
-		mask.image_data.format="A"
-		mask.image_data.pitch=self.img.width
-		mask.texture.blit_into(self.img,0,0,0)
-		self.mask=mask
+		self.px=-self.image.width/2
+		self.py=-self.image.height/2
 
 		# image sprite
+		self.sprite = pyglet.sprite.Sprite(
+			pyglet.resource.image(image),
+			self.px,
+			self.py
+		)
+
+		# image mask
+		mask=pyglet.image.create(self.image.width,self.image.height)
+		mask.image_data.format="A"
+		mask.image_data.pitch=self.image.width
+		mask.texture.blit_into(self.image,0,0,0)
+
+		# image mask sprite
+		self.mask_sprite = pyglet.sprite.Sprite(
+			mask.texture,
+			self.px,
+			self.py
+		)
+		self.mask_sprite.color = self.id_color
 
 	def touch(self,mouse_x,mouse_y):
 		self.selected=True
@@ -88,11 +100,9 @@ class Image(object):
 		glPushMatrix()
 		glTranslatef(self.x,self.y,self.z)
 		if mask:
-			glColor4f(self.id_color[0],self.id_color[1],self.id_color[2],1)
-			self.mask.blit(self.px,self.py,0)
-			glColor4f(1,1,1,1)
+			self.mask_sprite.draw()
 		else:
-			self.img.blit(self.px,self.py,0)
+			self.sprite.draw()
 		glPopMatrix()
 
 	def derive_color(self):
@@ -109,9 +119,9 @@ class Image(object):
 		elif H>=240: H-=240
 	
 		ang=float((H*9./6.)-90.)
-		c1=S*(0.5+I)
-		c2=S*math.cos(ang*-0.01745)
-		c3=S*(0.5-I)
+		c1=int(S*(0.5+I)*255)
+		c2=int(S*math.cos(ang*-0.01745)*255)
+		c3=int(S*(0.5-I)*255)
 	
 		if H>60:
 			temp=c1
@@ -122,33 +132,9 @@ class Image(object):
 		if Z==1: color=(c1,c2,c3)
 		elif Z==2: color=(c3,c1,c2)
 		elif Z==3: color=(c2,c3,c1)
-		print ("original color: ", color)
+		print "from id %d, derived color %s"%(self.id,str(color))
+		return color
 	
-		# When the mask is painted with glColor,
-		# the color returned by glReadPixels is not exactly the same.
-		# This code paints and then returns the real color.
-		glMatrixMode(GL_PROJECTION)
-		glPushMatrix()
-		glLoadIdentity()
-		glMatrixMode(GL_MODELVIEW)
-		glPushMatrix()
-		glLoadIdentity()
-		fc=(GLfloat * 4)()
-		glGetFloatv(GL_COLOR_CLEAR_VALUE,fc)
-		glClearColor(color[0],color[1],color[2],1)
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-		read_colors=(GLfloat * 3)()
-		glReadBuffer(GL_BACK)
-		glReadPixels(0,0,1,1,GL_RGB,GL_FLOAT,read_colors)
-		glClearColor(fc[0],fc[1],fc[2],fc[3])
-		painted_color=(float(read_colors[0]),float(read_colors[1]),float(read_colors[2]))
-		glMatrixMode(GL_PROJECTION)
-		glPopMatrix()
-		glMatrixMode(GL_MODELVIEW)
-		glPopMatrix()
-		print ("painted color: ", painted_color)
-		return painted_color
-
 #---------------------------------
 class Camera():
 
