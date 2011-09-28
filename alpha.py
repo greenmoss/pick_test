@@ -144,6 +144,8 @@ class Image(object):
 	
 #---------------------------------
 class Camera():
+	def __init__(self, scene):
+		self.scene = scene
 
 	def key(self, symbol, modifiers):
 		if symbol==key.F1:
@@ -166,6 +168,11 @@ class Camera():
 		scene.selected_image.sprite.y+=dy
 		scene.selected_image.sprite_mask.x=scene.selected_image.sprite.x
 		scene.selected_image.sprite_mask.y=scene.selected_image.sprite.y
+	
+	def draw(self):
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+		glLoadIdentity()
+		scene.draw()
 
 #---------------------------------
 print "Alpha Selection"
@@ -178,11 +185,12 @@ print "Add graphic	   -> RETURN"
 print ""
 
 scene=Images()
-cam=Camera()
+cam=Camera(scene)
 win = pyglet.window.Window()
 win.on_key_press=cam.key
 win.on_mouse_drag=cam.drag
 win.on_mouse_press=cam.click
+win.on_draw=cam.draw
 glEnable(GL_BLEND)
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 glDepthFunc(GL_LEQUAL)
@@ -190,9 +198,4 @@ glDepthFunc(GL_LEQUAL)
 for n in range (0,3):
 	scene.create_image(n)
 
-while not win.has_exit:
-	win.dispatch_events()
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-	glLoadIdentity()
-	scene.draw()
-	win.flip() 
+pyglet.app.run()
