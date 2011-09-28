@@ -22,7 +22,7 @@ import sys
 
 class Images(object):
 	'Keep track of all images'
-	selected=None
+	selected_image=None
 	mask=False
 	num=0
 	sprite_batch = pyglet.graphics.Batch()
@@ -33,21 +33,22 @@ class Images(object):
 	def __init__(self):
 		self.images=[]
 
-	def create_image(self):
+	def create_image(self, offset=0):
 		self.num+=1
-		image=Image(self.num,'graphic.png')
+		image=Image(self.num,'graphic.png',offset)
+
 		image.sprite.batch = self.sprite_batch
 		image.sprite.group = self.sprite_group
-		image.mask_sprite.batch = self.mask_batch
-		image.mask_sprite.group = self.mask_group
+
+		image.sprite_mask.batch = self.mask_batch
+		image.sprite_mask.group = self.mask_group
+
 		self.images.append(image)
 		return image
 
 	def click(self,x,y):
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glLoadIdentity()
-		for image in self.images:
-			image.selected=False
 		self.mask_batch.draw()
 
 		# read the pixel color of the selection area
@@ -57,11 +58,11 @@ class Images(object):
 		color=(c[0],c[1],c[2])
 		print "Color =",str(color)
 
-		self.selected = None
+		self.selected_image = None
 		for image in self.images:
 			if image.id_color==color:
 				image.touch(x,y)
-				self.selected = image
+				self.selected_image = image
 
 	def draw(self):
 		if self.mask:
@@ -71,10 +72,9 @@ class Images(object):
 
 #---------------------------------
 class Image(object):
-	selected=False
 	x,y=0,0
 
-	def __init__(self,id,image):
+	def __init__(self,id,image,offset=0):
 		self.id=id
 		self.image=pyglet.image.load(image)
 		self.id_color=self.derive_color()
@@ -88,6 +88,8 @@ class Image(object):
 			self.py
 		)
 		self.sprite.scale = 0.1
+		self.sprite.x=160+offset*160
+		self.sprite.y=240
 
 		# image mask
 		mask=pyglet.image.create(self.image.width,self.image.height)
@@ -96,16 +98,17 @@ class Image(object):
 		mask.texture.blit_into(self.image,0,0,0)
 
 		# image mask sprite
-		self.mask_sprite = pyglet.sprite.Sprite(
+		self.sprite_mask = pyglet.sprite.Sprite(
 			mask.texture,
 			self.px,
 			self.py
 		)
-		self.mask_sprite.color = self.id_color
-		self.mask_sprite.scale = self.sprite.scale
+		self.sprite_mask.color = self.id_color
+		self.sprite_mask.scale = self.sprite.scale
+		self.sprite_mask.x = self.sprite.x
+		self.sprite_mask.y = self.sprite.y
 
 	def touch(self,mouse_x,mouse_y):
-		self.selected=True
 		print "Space point=",str((mouse_x,mouse_y))
 		print "Plane point=",str((mouse_x-self.x,mouse_y-self.y))
 
@@ -157,12 +160,12 @@ class Camera():
 		scene.click(x,y)
 
 	def drag(self, x, y, dx, dy, button, modifiers):
-		if scene.selected == None:
+		if scene.selected_image == None:
 			return
-		scene.selected.sprite.x+=dx
-		scene.selected.sprite.y+=dy
-		scene.selected.mask_sprite.x=scene.selected.sprite.x
-		scene.selected.mask_sprite.y=scene.selected.sprite.y
+		scene.selected_image.sprite.x+=dx
+		scene.selected_image.sprite.y+=dy
+		scene.selected_image.sprite_mask.x=scene.selected_image.sprite.x
+		scene.selected_image.sprite_mask.y=scene.selected_image.sprite.y
 
 #---------------------------------
 print "Alpha Selection"
@@ -185,11 +188,7 @@ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 glDepthFunc(GL_LEQUAL)
 
 for n in range (0,3):
-	image=scene.create_image()
-	image.sprite.x=160+n*160
-	image.sprite.y=240
-	image.mask_sprite.x=image.sprite.x
-	image.mask_sprite.y=image.sprite.y
+	scene.create_image(n)
 
 while not win.has_exit:
 	win.dispatch_events()
