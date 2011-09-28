@@ -14,7 +14,6 @@
 
 import math
 import pyglet
-from pyglet.window import key
 from pyglet.gl import *
 import sys
 
@@ -143,36 +142,44 @@ class Image(object):
 		return color
 	
 #---------------------------------
-class Camera():
-	def __init__(self, scene):
-		self.scene = scene
+class Window(pyglet.window.Window):
 
-	def key(self, symbol, modifiers):
-		if symbol==key.F1:
+	def __init__(self):
+		self.scene = Images()
+		for n in range (0,3):
+			self.scene.create_image(n)
+
+		glEnable(GL_BLEND)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+		glDepthFunc(GL_LEQUAL)
+		super(Window, self).__init__(caption='Objects')
+
+	def on_key_press(self, symbol, modifiers):
+		if symbol==pyglet.window.key.F1:
 			print "Toggle Color Masks"
-			scene.mask=not scene.mask
-		elif symbol==key.RETURN:
-			scene.create_image()
-		elif symbol==key.ESCAPE:
+			self.scene.mask=not self.scene.mask
+		elif symbol==pyglet.window.key.RETURN:
+			self.scene.create_image()
+		elif symbol==pyglet.window.key.ESCAPE:
 			sys.exit()
-		else: print "KEY "+key.symbol_string(symbol)
+		else: print "KEY "+pyglet.window.key.symbol_string(symbol)
 
-	def click(self, x, y, button, modifiers):
+	def on_mouse_press(self, x, y, button, modifiers):
 		print "Mouse click at",str((x,y))
-		scene.click(x,y)
+		self.scene.click(x,y)
 
-	def drag(self, x, y, dx, dy, button, modifiers):
-		if scene.selected_image == None:
+	def on_mouse_drag(self, x, y, dx, dy, button, modifiers):
+		if self.scene.selected_image == None:
 			return
-		scene.selected_image.sprite.x+=dx
-		scene.selected_image.sprite.y+=dy
-		scene.selected_image.sprite_mask.x=scene.selected_image.sprite.x
-		scene.selected_image.sprite_mask.y=scene.selected_image.sprite.y
+		self.scene.selected_image.sprite.x+=dx
+		self.scene.selected_image.sprite.y+=dy
+		self.scene.selected_image.sprite_mask.x=self.scene.selected_image.sprite.x
+		self.scene.selected_image.sprite_mask.y=self.scene.selected_image.sprite.y
 	
-	def draw(self):
+	def on_draw(self):
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glLoadIdentity()
-		scene.draw()
+		self.scene.draw()
 
 #---------------------------------
 print "Alpha Selection"
@@ -184,18 +191,5 @@ print "Move image XY	 -> Drag LMB"
 print "Add graphic	   -> RETURN"
 print ""
 
-scene=Images()
-cam=Camera(scene)
-win = pyglet.window.Window()
-win.on_key_press=cam.key
-win.on_mouse_drag=cam.drag
-win.on_mouse_press=cam.click
-win.on_draw=cam.draw
-glEnable(GL_BLEND)
-glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-glDepthFunc(GL_LEQUAL)
-
-for n in range (0,3):
-	scene.create_image(n)
-
+window = Window()
 pyglet.app.run()
