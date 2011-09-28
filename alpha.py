@@ -25,12 +25,21 @@ class Images(object):
 	selected=None
 	mask=False
 	num=0
+	sprite_batch = pyglet.graphics.Batch()
+	sprite_group = pyglet.graphics.OrderedGroup(0)
+	mask_batch = pyglet.graphics.Batch()
+	mask_group = pyglet.graphics.OrderedGroup(1)
+
 	def __init__(self):
 		self.images=[]
 
 	def create_image(self):
 		self.num+=1
 		image=Image(self.num,'graphic.png')
+		image.sprite.batch = self.sprite_batch
+		image.sprite.group = self.sprite_group
+		image.mask_sprite.batch = self.mask_batch
+		image.mask_sprite.group = self.mask_group
 		self.images.append(image)
 		return image
 
@@ -39,7 +48,7 @@ class Images(object):
 		glLoadIdentity()
 		for image in self.images:
 			image.selected=False
-			image.draw(True)
+		self.mask_batch.draw()
 
 		# read the pixel color of the selection area
 		c=(GLubyte * 3)()
@@ -55,13 +64,15 @@ class Images(object):
 				self.selected = image
 
 	def draw(self):
-		for image in self.images:
-			image.draw(self.mask)
+		if self.mask:
+			self.mask_batch.draw()
+		else:
+			self.sprite_batch.draw()
 
 #---------------------------------
 class Image(object):
 	selected=False
-	x,y,z=0,0,0
+	x,y=0,0
 
 	def __init__(self,id,image):
 		self.id=id
@@ -76,6 +87,7 @@ class Image(object):
 			self.px,
 			self.py
 		)
+		self.sprite.scale = 0.1
 
 		# image mask
 		mask=pyglet.image.create(self.image.width,self.image.height)
@@ -90,20 +102,12 @@ class Image(object):
 			self.py
 		)
 		self.mask_sprite.color = self.id_color
+		self.mask_sprite.scale = self.sprite.scale
 
 	def touch(self,mouse_x,mouse_y):
 		self.selected=True
 		print "Space point=",str((mouse_x,mouse_y))
 		print "Plane point=",str((mouse_x-self.x,mouse_y-self.y))
-
-	def draw(self,mask=False):
-		glPushMatrix()
-		glTranslatef(self.x,self.y,self.z)
-		if mask:
-			self.mask_sprite.draw()
-		else:
-			self.sprite.draw()
-		glPopMatrix()
 
 	def derive_color(self):
 		'''Returns a color derived from int self.id'''
@@ -155,8 +159,10 @@ class Camera():
 	def drag(self, x, y, dx, dy, button, modifiers):
 		if scene.selected == None:
 			return
-		scene.selected.x+=dx
-		scene.selected.y+=dy
+		scene.selected.sprite.x+=dx
+		scene.selected.sprite.y+=dy
+		scene.selected.mask_sprite.x=scene.selected.sprite.x
+		scene.selected.mask_sprite.y=scene.selected.sprite.y
 
 #---------------------------------
 print "Alpha Selection"
@@ -180,9 +186,10 @@ glDepthFunc(GL_LEQUAL)
 
 for n in range (0,3):
 	image=scene.create_image()
-	image.x=160+n*160
-	image.y=240
-	image.z=n-1
+	image.sprite.x=160+n*160
+	image.sprite.y=240
+	image.mask_sprite.x=image.sprite.x
+	image.mask_sprite.y=image.sprite.y
 
 while not win.has_exit:
 	win.dispatch_events()
