@@ -34,7 +34,7 @@ class Images(object):
 
 	def create_image(self, offset=0):
 		self.num+=1
-		image=Image(self.num,'graphic.png',offset)
+		image=Image(self.num,'Hue_alpha.png',offset)
 
 		image.sprite.batch = self.sprite_batch
 		image.sprite.group = self.sprite_group
