@@ -16,6 +16,7 @@ import math
 import pyglet
 from pyglet.gl import *
 import sys
+import struct
 
 #---------------------------------
 
@@ -91,10 +92,21 @@ class Image(object):
 		self.sprite.y=240
 
 		# image mask
-		mask=pyglet.image.create(self.image.width,self.image.height)
-		mask.image_data.format="A"
-		mask.image_data.pitch=self.image.width
-		mask.texture.blit_into(self.image,0,0,0)
+		mask = pyglet.image.create(self.image.width, self.image.height)
+		image_data = self.image.get_image_data()
+		pixel_bytes = image_data.get_data('RGBA', image_data.width * 4)
+		mask_bytes = ''
+		for position in range(int(len(pixel_bytes)/4)):
+			bytes = struct.unpack_from('4c', pixel_bytes, 4*position)
+
+			# alpha channel is partially opaque, set alpha to 255
+			if ord(bytes[3]) > 0:
+				mask_bytes += '\xff\xff\xff\xff'
+
+			# alpha channel is fully transparent, set alpha to 0
+			else:
+				mask_bytes += '\xff\xff\xff\x00'
+		mask.image_data.set_data('RGBA', image_data.width * 4, mask_bytes)
 
 		# image mask sprite
 		self.sprite_mask = pyglet.sprite.Sprite(
