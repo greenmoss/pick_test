@@ -88,8 +88,8 @@ class Image(object):
 			self.py
 		)
 		self.sprite.scale = 0.1
-		self.sprite.x=160+offset*160
-		self.sprite.y=240
+		self.sprite.x=-50+offset*160
+		self.sprite.y=0
 
 		# image mask
 		mask = pyglet.image.create(self.image.width, self.image.height)
@@ -99,11 +99,11 @@ class Image(object):
 		for position in range(int(len(pixel_bytes)/4)):
 			bytes = struct.unpack_from('4c', pixel_bytes, 4*position)
 
-			# alpha channel is partially opaque, set alpha to 255
+			# alpha channel is partially opaque, set color to white, alpha to 255
 			if ord(bytes[3]) > 0:
 				mask_bytes += '\xff\xff\xff\xff'
 
-			# alpha channel is fully transparent, set alpha to 0
+			# alpha channel is fully transparent, set color to white, alpha to 0
 			else:
 				mask_bytes += '\xff\xff\xff\x00'
 		mask.image_data.set_data('RGBA', image_data.width * 4, mask_bytes)
@@ -177,8 +177,10 @@ class Window(pyglet.window.Window):
 		else: print "KEY "+pyglet.window.key.symbol_string(symbol)
 
 	def on_mouse_press(self, x, y, button, modifiers):
-		print "Mouse click at",str((x,y))
-		self.scene.click(x,y)
+		adjusted_x = x-200
+		adjusted_y = y-200
+		print "Mouse click at",str((adjusted_x,adjusted_y))
+		self.scene.click(adjusted_x,adjusted_y)
 
 	def on_mouse_drag(self, x, y, dx, dy, button, modifiers):
 		if self.scene.selected_image == None:
@@ -191,6 +193,10 @@ class Window(pyglet.window.Window):
 	def on_draw(self):
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glLoadIdentity()
+		gluLookAt(
+			-200, -200, 0.0,
+			-200, -200, -100.0,
+			0.0, 1.0, 0.0)
 		self.scene.draw()
 
 #---------------------------------
